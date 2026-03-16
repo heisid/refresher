@@ -29,27 +29,33 @@ for entry in stacked_freq_domain[:N//2]:
     freq_point, mag_point, phase_point = entry
     recreated += mag_point*np.cos(2*np.pi*freq_point*t + phase_point)
 
-plt.subplot(2, 2, 1)
+plt.subplot(3, 2, 1)
 plt.plot(t, signal)
 plt.title('Time Domain Signal')
 plt.xlabel('Time [s]')
 plt.ylabel('Amplitude')
 
-plt.subplot(2, 2, 2)
+plt.subplot(3, 2, 2)
 plt.stem(freq[:N//2], magnitude[:N//2])
 plt.title('Frequency Domain (Magnitude Spectrum)')
 plt.xlabel('Frequency [Hz]')
 plt.ylabel('Magnitude')
 
-plt.subplot(2, 2, 3)
+plt.subplot(3, 2, 3)
 plt.stem(freq[:N//2], phase[:N//2])
 plt.title('Phase')
 plt.xlabel('Phase')
 plt.ylabel('Angle [deg]')
 
-plt.subplot(2, 2, 4)
+plt.subplot(3, 2, 4)
 plt.plot(t, recreated)
 plt.title('Recreated Signal')
+plt.xlabel('Time [s]')
+plt.ylabel('Amplitude')
+
+plt.subplot(3, 2, 5)
+plt.plot(t, np.absolute(signal - recreated))
+plt.title('Error')
 plt.xlabel('Time [s]')
 plt.ylabel('Amplitude')
 
