@@ -16,11 +16,13 @@ def cartesian_to_pil(x, y, width, height, scale):
     return px, py
 
 
-def transform(z, t):
-    return z + 0.25 * cmath.sinh(0.5 * z * cmath.exp(1j * t))
+def transform(z, t, framenum):
+    # return z + 0.25 * cmath.sinh(0.5 * z * cmath.exp(1j * t))
+    r = t / framenum
+    return (1 - r) * z + r * cmath.exp(z)
 
 
-def render_frame(input_pixels, width, height, scale, t):
+def render_frame(input_pixels, width, height, scale, t, n):
     output_img = Image.new("RGB", (width, height))
     output_pixels = output_img.load()
 
@@ -29,7 +31,7 @@ def render_frame(input_pixels, width, height, scale, t):
             wx, wy = pil_to_cartesian(x, y, width, height, scale)
             w = complex(wx, wy)
 
-            z = transform(w, t)
+            z = transform(w, t, n)
 
             src_x, src_y = cartesian_to_pil(z.real, z.imag, width, height, scale)
 
@@ -60,12 +62,12 @@ def main():
 
     os.makedirs("frames", exist_ok=True)
 
-    for i in range(frames):
-        t = 2 * math.pi * i / frames
-        frame = render_frame(input_pixels, width, height, scale, t)
-        frame.save(f"frames/frame_{i:03d}.png")
+    for t in range(frames):
+        # t = 2 * math.pi * i / frames
+        frame = render_frame(input_pixels, width, height, scale, t, frames)
+        frame.save(f"frames/frame_{t:03d}.png")
 
 
 if __name__ == "__main__":
-    # main()
+    main()
     make_gif()
