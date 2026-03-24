@@ -33,7 +33,7 @@ def main():
             if abs(w) < 1e-8:
                 continue
 
-            z = cmath.tanh(w)
+            z = cmath.log(w)
 
             src_x, src_y = cartesian_to_pil(z.real, z.imag, width, height, scale)
 

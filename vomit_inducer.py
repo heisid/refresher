@@ -1,3 +1,4 @@
+import imageio
 from PIL import Image
 import numpy as np
 import os
@@ -24,13 +25,14 @@ def render_frame_numpy(input_array, width, height, scale, t, n):
 
 
 def make_gif():
-    frames = [Image.open(f"frames/frame_{i:03d}.png") for i in range(60)]
+    frames = [Image.open(f"frames/frame_{i:03d}.jpg") for i in range(60)]
     frames[0].save("animation.gif", save_all=True, append_images=frames[1:], duration=40, loop=0)
 
+
 def make_mp4(fps=25):
-    writer = imageio.get_writer("animation.mp4", fps=fps)
+    writer = imageio.v2.get_writer("animation.mp4", fps=fps)
     for i in range(60):
-        frame = imageio.imread(f"frames/frame_{i:03d}.jpg")
+        frame = imageio.v2.imread(f"frames/frame_{i:03d}.jpg")
         writer.append_data(frame)
     writer.close()
 
@@ -46,9 +48,9 @@ def main():
 
     for t in range(frames):
         frame = render_frame_numpy(input_array, width, height, scale, t, frames)
-        frame.save(f"frames/frame_{t:03d}.png")
+        frame.save(f"frames/frame_{t:03d}.jpg")
 
 
 if __name__ == "__main__":
     main()
-    make_gif()
+    make_mp4()
