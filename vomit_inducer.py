@@ -27,6 +27,13 @@ def make_gif():
     frames = [Image.open(f"frames/frame_{i:03d}.png") for i in range(60)]
     frames[0].save("animation.gif", save_all=True, append_images=frames[1:], duration=40, loop=0)
 
+def make_mp4(fps=25):
+    writer = imageio.get_writer("animation.mp4", fps=fps)
+    for i in range(60):
+        frame = imageio.imread(f"frames/frame_{i:03d}.jpg")
+        writer.append_data(frame)
+    writer.close()
+
 
 def main():
     input_img = Image.open("input.jpg")
