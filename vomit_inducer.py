@@ -4,14 +4,18 @@ import numpy as np
 import os
 
 
+def transition(callback, w, t, n):
+    r = t / n
+    return (1 - r) * w + r * callback(w)
+
+
 def render_frame_numpy(input_array, width, height, scale, t, n):
     xs = np.linspace(-scale, scale, width)
     ys = np.linspace(scale, -scale, height)
     wx, wy = np.meshgrid(xs, ys)
     w = wx + 1j * wy
 
-    r = t / n
-    z = (1 - r) * w + r * np.log(w)
+    z = transition(np.tanh, w, t, n)
 
     src_x = ((z.real / scale) * (width / 2) + width / 2).astype(int)
     src_y = ((-z.imag / scale) * (height / 2) + height / 2).astype(int)
