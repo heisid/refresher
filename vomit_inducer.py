@@ -1,70 +1,44 @@
 from PIL import Image
-import cmath
-import math
+import numpy as np
 import os
 
 
-def pil_to_cartesian(x, y, width, height, scale):
-    cx = (x - width / 2) / (width / 2) * scale
-    cy = -(y - height / 2) / (height / 2) * scale
-    return cx, cy
+def render_frame_numpy(input_array, width, height, scale, t, n):
+    xs = np.linspace(-scale, scale, width)
+    ys = np.linspace(scale, -scale, height)
+    wx, wy = np.meshgrid(xs, ys)
+    w = wx + 1j * wy
 
+    r = t / n
+    z = (1 - r) * w + r * np.log(w)
 
-def cartesian_to_pil(x, y, width, height, scale):
-    px = int((x / scale) * (width / 2) + width / 2)
-    py = int((-y / scale) * (height / 2) + height / 2)
-    return px, py
+    src_x = ((z.real / scale) * (width / 2) + width / 2).astype(int)
+    src_y = ((-z.imag / scale) * (height / 2) + height / 2).astype(int)
 
+    valid = (src_x >= 0) & (src_x < width) & (src_y >= 0) & (src_y < height)
 
-def transform(z, t, framenum):
-    # return z + 0.25 * cmath.sinh(0.5 * z * cmath.exp(1j * t))
-    r = t / framenum
-    return (1 - r) * z + r * cmath.exp(z)
+    output = np.zeros((height, width, 3), dtype=np.uint8)
+    output[valid] = input_array[src_y[valid], src_x[valid]]
 
-
-def render_frame(input_pixels, width, height, scale, t, n):
-    output_img = Image.new("RGB", (width, height))
-    output_pixels = output_img.load()
-
-    for x in range(width):
-        for y in range(height):
-            wx, wy = pil_to_cartesian(x, y, width, height, scale)
-            w = complex(wx, wy)
-
-            z = transform(w, t, n)
-
-            src_x, src_y = cartesian_to_pil(z.real, z.imag, width, height, scale)
-
-            if 0 <= src_x < width and 0 <= src_y < height:
-                output_pixels[x, y] = input_pixels[src_x, src_y]
-
-    return output_img
+    return Image.fromarray(output)
 
 
 def make_gif():
     frames = [Image.open(f"frames/frame_{i:03d}.png") for i in range(60)]
-    frames[0].save(
-        "animation.gif",
-        save_all=True,
-        append_images=frames[1:],
-        duration=40,
-        loop=0
-    )
+    frames[0].save("animation.gif", save_all=True, append_images=frames[1:], duration=40, loop=0)
 
 
 def main():
     input_img = Image.open("input.jpg")
     width, height = input_img.size
-    input_pixels = input_img.load()
+    input_array = np.array(input_img)
 
     scale = 2.0
     frames = 60
-
     os.makedirs("frames", exist_ok=True)
 
     for t in range(frames):
-        # t = 2 * math.pi * i / frames
-        frame = render_frame(input_pixels, width, height, scale, t, frames)
+        frame = render_frame_numpy(input_array, width, height, scale, t, frames)
         frame.save(f"frames/frame_{t:03d}.png")
 
 
