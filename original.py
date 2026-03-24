@@ -8,7 +8,9 @@ t = np.arange(0, 1, T)
 f1 = 10
 f2 = 15
 f3 = 20
-signal = 0.7*np.sin(2*np.pi*f1*t) + 1.0*np.sin(2*np.pi*f2*t) + 3.0*np.cos(2*np.pi*f3*t)
+signal = (0.7*np.sin(2*np.pi*f1*t) +
+          1.0*np.sin(2*np.pi*f2*t) +
+          3.0*np.cos(2*np.pi*f3*t))
 
 fft_values_raw = np.fft.fft(signal)
 threshold = 0.05 * np.max(np.abs(fft_values_raw))
